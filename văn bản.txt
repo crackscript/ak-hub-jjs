@@ -1,4 +1,4 @@
--- AK HUB - Organized Menu (Target Player & Misc List)
+-- AK HUB - Organized Menu (Target Player, Misc List & Other Script)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
@@ -107,7 +107,7 @@ CloseBtn.TextColor3 = Color3.new(1, 1, 1)
 CloseBtn.Font = Enum.Font.SourceSansBold
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
 
--- Hệ thống Tab
+-- Hệ thống 3 Tab (Target Player, Misc List, Other Script)
 local TabBar = Instance.new("Frame", MainFrame)
 TabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 TabBar.Position = UDim2.new(0, 10, 0, 45)
@@ -116,29 +116,39 @@ Instance.new("UICorner", TabBar).CornerRadius = UDim.new(0, 6)
 
 local TargetTabBtn = Instance.new("TextButton", TabBar)
 TargetTabBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-TargetTabBtn.Position = UDim2.new(0, 5, 0, 3)
-TargetTabBtn.Size = UDim2.new(0.5, -8, 1, -6)
+TargetTabBtn.Position = UDim2.new(0, 4, 0, 3)
+TargetTabBtn.Size = UDim2.new(0.33, -6, 1, -6)
 TargetTabBtn.Text = "Target Player"
 TargetTabBtn.TextColor3 = Color3.fromRGB(0, 255, 128)
 TargetTabBtn.Font = Enum.Font.SourceSansBold
-TargetTabBtn.TextSize = 13
+TargetTabBtn.TextSize = 12
 Instance.new("UICorner", TargetTabBtn).CornerRadius = UDim.new(0, 4)
 
 local MiscTabBtn = Instance.new("TextButton", TabBar)
 MiscTabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-MiscTabBtn.Position = UDim2.new(0.5, 3, 0, 3)
-MiscTabBtn.Size = UDim2.new(0.5, -8, 1, -6)
+MiscTabBtn.Position = UDim2.new(0.33, 2, 0, 3)
+MiscTabBtn.Size = UDim2.new(0.33, -6, 1, -6)
 MiscTabBtn.Text = "Misc List"
 MiscTabBtn.TextColor3 = Color3.fromRGB(170, 170, 170)
 MiscTabBtn.Font = Enum.Font.SourceSansBold
-MiscTabBtn.TextSize = 13
+MiscTabBtn.TextSize = 12
 Instance.new("UICorner", MiscTabBtn).CornerRadius = UDim.new(0, 4)
+
+local OtherTabBtn = Instance.new("TextButton", TabBar)
+OtherTabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+OtherTabBtn.Position = UDim2.new(0.66, 0, 0, 3)
+OtherTabBtn.Size = UDim2.new(0.33, -6, 1, -6)
+OtherTabBtn.Text = "Other Script"
+OtherTabBtn.TextColor3 = Color3.fromRGB(170, 170, 170)
+OtherTabBtn.Font = Enum.Font.SourceSansBold
+OtherTabBtn.TextSize = 12
+Instance.new("UICorner", OtherTabBtn).CornerRadius = UDim.new(0, 4)
 
 local TargetContainer = Instance.new("ScrollingFrame", MainFrame)
 TargetContainer.Position = UDim2.new(0, 10, 0, 85)
 TargetContainer.Size = UDim2.new(1, -20, 1, -95)
 TargetContainer.BackgroundTransparency = 1
-TargetContainer.CanvasSize = UDim2.new(0, 0, 0, 480)
+TargetContainer.CanvasSize = UDim2.new(0, 0, 0, 530)
 TargetContainer.ScrollBarThickness = 4
 TargetContainer.Visible = true
 
@@ -150,22 +160,51 @@ MiscContainer.CanvasSize = UDim2.new(0, 0, 0, 680)
 MiscContainer.ScrollBarThickness = 4
 MiscContainer.Visible = false
 
+local OtherContainer = Instance.new("ScrollingFrame", MainFrame)
+OtherContainer.Position = UDim2.new(0, 10, 0, 85)
+OtherContainer.Size = UDim2.new(1, -20, 1, -95)
+OtherContainer.BackgroundTransparency = 1
+OtherContainer.CanvasSize = UDim2.new(0, 0, 0, 300)
+OtherContainer.ScrollBarThickness = 4
+OtherContainer.Visible = false
+
 TargetTabBtn.MouseButton1Click:Connect(function()
     TargetContainer.Visible = true
     MiscContainer.Visible = false
+    OtherContainer.Visible = false
+    
     TargetTabBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     TargetTabBtn.TextColor3 = Color3.fromRGB(0, 255, 128)
     MiscTabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     MiscTabBtn.TextColor3 = Color3.fromRGB(170, 170, 170)
+    OtherTabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    OtherTabBtn.TextColor3 = Color3.fromRGB(170, 170, 170)
 end)
 
 MiscTabBtn.MouseButton1Click:Connect(function()
     TargetContainer.Visible = false
     MiscContainer.Visible = true
+    OtherContainer.Visible = false
+    
     MiscTabBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     MiscTabBtn.TextColor3 = Color3.fromRGB(0, 255, 128)
     TargetTabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     TargetTabBtn.TextColor3 = Color3.fromRGB(170, 170, 170)
+    OtherTabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    OtherTabBtn.TextColor3 = Color3.fromRGB(170, 170, 170)
+end)
+
+OtherTabBtn.MouseButton1Click:Connect(function()
+    TargetContainer.Visible = false
+    MiscContainer.Visible = false
+    OtherContainer.Visible = true
+    
+    OtherTabBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    OtherTabBtn.TextColor3 = Color3.fromRGB(0, 255, 128)
+    TargetTabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    TargetTabBtn.TextColor3 = Color3.fromRGB(170, 170, 170)
+    MiscTabBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    MiscTabBtn.TextColor3 = Color3.fromRGB(170, 170, 170)
 end)
 
 local function CreateTargetToggle(name, desc, yPos, callback)
@@ -342,6 +381,51 @@ local function CreateMiscValueBox(name, defaultVal, yPos, callback)
     end)
 end
 
+-- Hàm tạo nút bấm thực thi Script khác trong tab Other Script
+local function CreateOtherScriptButton(name, desc, scriptUrl, yPos)
+    local row = Instance.new("Frame", OtherContainer)
+    row.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    row.Position = UDim2.new(0, 0, 0, yPos)
+    row.Size = UDim2.new(1, 0, 0, 55)
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
+    
+    local titleLab = Instance.new("TextLabel", row)
+    titleLab.Position = UDim2.new(0, 12, 0, 6)
+    titleLab.Size = UDim2.new(0, 280, 0, 22)
+    titleLab.Text = name
+    titleLab.TextColor3 = Color3.new(1, 1, 1)
+    titleLab.Font = Enum.Font.SourceSansBold
+    titleLab.TextSize = 14
+    titleLab.BackgroundTransparency = 1
+    titleLab.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local descLab = Instance.new("TextLabel", row)
+    descLab.Position = UDim2.new(0, 12, 0, 26)
+    descLab.Size = UDim2.new(0, 280, 0, 20)
+    descLab.Text = desc
+    descLab.TextColor3 = Color3.fromRGB(170, 170, 170)
+    descLab.Font = Enum.Font.SourceSans
+    descLab.TextSize = 11
+    descLab.BackgroundTransparency = 1
+    descLab.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local execBtn = Instance.new("TextButton", row)
+    execBtn.Position = UDim2.new(1, -85, 0.5, -15)
+    execBtn.Size = UDim2.new(0, 75, 0, 30)
+    execBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+    execBtn.Text = "Run"
+    execBtn.TextColor3 = Color3.new(1, 1, 1)
+    execBtn.Font = Enum.Font.SourceSansBold
+    execBtn.TextSize = 13
+    Instance.new("UICorner", execBtn).CornerRadius = UDim.new(0, 6)
+    
+    execBtn.MouseButton1Click:Connect(function()
+        pcall(function()
+            loadstring(game:HttpGet(scriptUrl))()
+        end)
+    end)
+end
+
 -- Biến trạng thái toàn cục
 local isFeatureEnabled = false
 local isLocked = false
@@ -415,6 +499,88 @@ end)
 CreateTargetValueBox("   ↳ Attach Distance (Khoảng cách bám)", 3, 405, function(val)
     attachDistance = val
 end)
+
+-- Chọn danh sách người chơi trực tiếp trong Target Container
+local targetSelectRow = Instance.new("Frame", TargetContainer)
+targetSelectRow.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+targetSelectRow.Position = UDim2.new(0, 0, 0, 460)
+targetSelectRow.Size = UDim2.new(1, 0, 0, 50)
+Instance.new("UICorner", targetSelectRow).CornerRadius = UDim.new(0, 6)
+
+local targetSelectLabel = Instance.new("TextLabel", targetSelectRow)
+targetSelectLabel.Position = UDim2.new(0, 12, 0, 0)
+targetSelectLabel.Size = UDim2.new(0, 180, 1, 0)
+targetSelectLabel.Text = "Chọn Target Cụ Thể:"
+targetSelectLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+targetSelectLabel.Font = Enum.Font.SourceSansBold
+targetSelectLabel.TextSize = 13
+targetSelectLabel.BackgroundTransparency = 1
+targetSelectLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local targetDropdownBtn = Instance.new("TextButton", targetSelectRow)
+targetDropdownBtn.Position = UDim2.new(1, -195, 0.5, -14)
+targetDropdownBtn.Size = UDim2.new(0, 185, 0, 28)
+targetDropdownBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+targetDropdownBtn.Text = "Bấm để chọn Player"
+targetDropdownBtn.TextColor3 = Color3.fromRGB(0, 255, 128)
+targetDropdownBtn.Font = Enum.Font.SourceSansBold
+targetDropdownBtn.TextSize = 12
+Instance.new("UICorner", targetDropdownBtn).CornerRadius = UDim.new(0, 4)
+
+local playerListFrame = Instance.new("ScrollingFrame", ScreenGui)
+playerListFrame.Name = "PlayerListPopup"
+playerListFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+playerListFrame.Position = UDim2.new(0.5, -100, 0.5, -120)
+playerListFrame.Size = UDim2.new(0, 200, 0, 240)
+playerListFrame.Visible = false
+playerListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+playerListFrame.ScrollBarThickness = 4
+Instance.new("UICorner", playerListFrame).CornerRadius = UDim.new(0, 8)
+
+local UIListLayout = Instance.new("UIListLayout", playerListFrame)
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 4)
+
+targetDropdownBtn.MouseButton1Click:Connect(function()
+    playerListFrame.Visible = not playerListFrame.Visible
+    if playerListFrame.Visible then
+        for _, child in ipairs(playerListFrame:GetChildren()) do
+            if child:IsA("TextButton") then
+                child:Destroy()
+            end
+        end
+        
+        local count = 0
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LocalPlayer then
+                count = count + 1
+                local pBtn = Instance.new("TextButton", playerListFrame)
+                pBtn.Size = UDim2.new(1, -10, 0, 30)
+                pBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+                pBtn.Text = p.Name
+                pBtn.TextColor3 = Color3.new(1, 1, 1)
+                pBtn.Font = Enum.Font.SourceSansBold
+                pBtn.TextSize = 13
+                Instance.new("UICorner", pBtn).CornerRadius = UDim.new(0, 4)
+                
+                pBtn.MouseButton1Click:Connect(function()
+                    if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                        currentTarget = p.Character
+                        isLocked = true
+                        TargetInfoFrame.Visible = true
+                        SmallLockBtn.Text = "LOCK\nON"
+                        SmallLockBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+                        targetDropdownBtn.Text = p.Name
+                    end
+                    playerListFrame.Visible = false
+                end)
+            end
+        end
+        playerListFrame.CanvasSize = UDim2.new(0, 0, 0, count * 34)
+    end
+end)
+
+TargetContainer.CanvasSize = UDim2.new(0, 0, 0, 530)
 
 -- PHẦN 2: MISC LIST TAB
 CreateMiscToggle("Modo Voo (Fly)", "Bay tự do theo góc nhìn Camera (không cần bấm phím)", 0, function(isOn)
@@ -542,8 +708,15 @@ CreateMiscValueBox("   ↳ Jerk Speed (Tốc độ quay tay)", 25, 600, function
     jarSpeed = val
 end)
 
+-- PHẦN 3: OTHER SCRIPT TAB (Chứa các script bên ngoài tiện ích)
+CreateOtherScriptButton("TBO", "TBO Script", "https://raw.githubusercontent.com/cool5013/TBO/main/TBOscript", 0)
+CreateOtherScriptButton("Infinite Yield", "Admin Commands phổ biến nhất", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source", 60)
+CreateOtherScriptButton("Dex Explorer", "Trình duyệt kiểm tra Explorer / Properties", "https://gist.githubusercontent.com/dementiaenjoyer/1f81ce473487cfbb3b8bc19d9b62fef2/raw", 120)
+CreateOtherScriptButton("Remote Spy", "Theo dõi sự kiện RemoteEvent / RemoteFunction", "https://raw.githubusercontent.com/exxtremeshadow/Display-Scripts/main/RemoteSpy.lua", 180)
+
 CloseBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
+    playerListFrame.Visible = false
 end)
 
 ToggleMenuBtn.MouseButton1Click:Connect(function()
@@ -637,7 +810,6 @@ RunService.RenderStepped:Connect(function(dt)
         if isJarAnimation then
             hum.PlatformStand = true
             jarTime = jarTime + (dt * jarSpeed)
-            -- Ép góc quay và tịnh tiến liên tục để mô phỏng chính xác hành động jerk off
             local basePos = hrp.Position
             local pushPull = math.sin(jarTime) * 1.8
             local tilt = math.rad(55) + math.sin(jarTime * 2) * 0.4
@@ -727,10 +899,11 @@ RunService.RenderStepped:Connect(function(dt)
                 isLocked = false
                 currentTarget = nil
                 TargetInfoFrame.Visible = false
-                    SmallLockBtn.Text = "LOCK\nOFF"
-                    SmallLockBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-                    Camera.CameraType = Enum.CameraType.Custom
+                SmallLockBtn.Text = "LOCK\nOFF"
+                SmallLockBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+                Camera.CameraType = Enum.CameraType.Custom
             end
         end
     end
 end)
+
