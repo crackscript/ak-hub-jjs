@@ -1,1 +1,470 @@
-loadstring(game:HttpGet("https://gist.githubusercontent.com/thichucdaonguyen-ai/5123318977ab61df94fa1eb69804ebae/raw"))()
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = {
+    BypassTuDong = true,
+    FarmSkill = true,
+    TuDongTrap = true,
+    TuDongUlt = true,
+    TuDongEnd = true,
+    CheDoKetThuc = "Hop",
+    TocDoKill = 0.01,
+    TocDoBypas = 0.1
+}
+
+local State = {
+    DangChay = false,
+    LanChay = 0,
+    TrangThai = "Chờ",
+    SoNguoiChet = 0
+}
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "GOJO KILL ALL by JJSISBEST",
+    LoadingTitle = "Đang tải...",
+    LoadingSubtitle = "Khởi động Rayfield",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "GojoKillAll",
+        FileName = "config.json"
+    },
+    Discord = {Enabled = false},
+    KeySystem = false
+})
+
+local TabChinh = Window:CreateTab("Chính", 4483362458)
+
+local NhanDo = TabChinh:CreateLabel("🔴 Trạng thái: Chờ | Giết: 0 | Lần: 0")
+TabChinh:CreateDivider()
+
+TabChinh:CreateSection("Tính Năng")
+
+local ToggleBypas = TabChinh:CreateToggle({
+    Name = "Tự Động Vượt Qua",
+    CurrentValue = Config.BypassTuDong,
+    Flag = "BypassTuDong",
+    Callback = function(Value)
+        Config.BypassTuDong = Value
+    end,
+})
+
+local ToggleFarm = TabChinh:CreateToggle({
+    Name = "Tự Động Farm Skill",
+    CurrentValue = Config.FarmSkill,
+    Flag = "FarmSkill",
+    Callback = function(Value)
+        Config.FarmSkill = Value
+    end,
+})
+
+local ToggleTrap = TabChinh:CreateToggle({
+    Name = "Tự Động Trap",
+    CurrentValue = Config.TuDongTrap,
+    Flag = "TuDongTrap",
+    Callback = function(Value)
+        Config.TuDongTrap = Value
+    end,
+})
+
+local ToggleUlt = TabChinh:CreateToggle({
+    Name = "Tự Động Skill Cuối (0.2 Domain)",
+    CurrentValue = Config.TuDongUlt,
+    Flag = "TuDongUlt",
+    Callback = function(Value)
+        Config.TuDongUlt = Value
+    end,
+})
+
+local ToggleEnd = TabChinh:CreateToggle({
+    Name = "Tự Động Kết Thúc",
+    CurrentValue = Config.TuDongEnd,
+    Flag = "TuDongEnd",
+    Callback = function(Value)
+        Config.TuDongEnd = Value
+    end,
+})
+
+TabChinh:CreateDivider()
+
+TabChinh:CreateSection("Chế Độ Kết Thúc")
+
+local DropdownEnd = TabChinh:CreateDropdown({
+    Name = "Sau Khi Giết Hết",
+    Options = {"Hop Server", "Rời Game", "Chờ"},
+    CurrentOption = {"Hop Server"},
+    MultipleOptions = false,
+    Flag = "CheDoKetThuc",
+    Callback = function(Options)
+        if Options[1] == "Hop Server" then
+            Config.CheDoKetThuc = "Hop"
+        elseif Options[1] == "Rời Game" then
+            Config.CheDoKetThuc = "Leave"
+        else
+            Config.CheDoKetThuc = "Idle"
+        end
+    end,
+})
+
+TabChinh:CreateDivider()
+
+TabChinh:CreateSection("Điều Khiển")
+
+local NutStart = TabChinh:CreateButton({
+    Name = "▶️ BẮT ĐẦU",
+    Callback = function()
+        State.DangChay = not State.DangChay
+        if State.DangChay then
+            State.LanChay = 0
+            State.SoNguoiChet = 0
+            NutStart:Set("⏹️ DỪNG")
+            task.spawn(VongLapChinh)
+        else
+            NutStart:Set("▶️ BẮT ĐẦU")
+        end
+        CapNhatNhan()
+    end,
+})
+
+local TabCaiDat = Window:CreateTab("Cài Đặt", 0)
+
+TabCaiDat:CreateSection("Tốc Độ")
+
+local SliderKill = TabCaiDat:CreateSlider({
+    Name = "Tốc Độ Giết",
+    Range = {0.001, 0.1},
+    Increment = 0.001,
+    Suffix = "s",
+    CurrentValue = Config.TocDoKill,
+    Flag = "TocDoKill",
+    Callback = function(Value)
+        Config.TocDoKill = Value
+    end,
+})
+
+local SliderBypas = TabCaiDat:CreateSlider({
+    Name = "Tốc Độ Vượt Qua",
+    Range = {0.05, 0.5},
+    Increment = 0.05,
+    Suffix = "s",
+    CurrentValue = Config.TocDoBypas,
+    Flag = "TocDoBypas",
+    Callback = function(Value)
+        Config.TocDoBypas = Value
+    end,
+})
+
+local function CapNhatNhan()
+    local trangThai = State.DangChay and "🟢 ĐANG CHẠY" or "🔴 CHỜXỬ LÝ"
+    NhanDo:Set(trangThai .. " | Giết: " .. State.SoNguoiChet .. " | Lần: " .. State.LanChay)
+end
+
+local function LuuNhat(msg)
+    State.TrangThai = msg
+    print("[GOJO] " .. msg)
+    CapNhatNhan()
+end
+
+local function LayNhomThuChua()
+    local enemies = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            table.insert(enemies, player.Character)
+        end
+    end
+    return enemies
+end
+
+local function LayDummy()
+    local workspace = game:GetService("Workspace")
+    local Characters = workspace:FindFirstChild("Characters")
+    if Characters then
+        return Characters:FindFirstChild("Dummy")
+    end
+    return nil
+end
+
+local function LayNhanVat()
+    return LocalPlayer.Character
+end
+
+local function LayHRP(character)
+    if not character then return nil end
+    return character:FindFirstChild("HumanoidRootPart")
+end
+
+local function VuotQua()
+    if not State.DangChay then return false end
+    
+    LuuNhat("Đang vượt qua phát hiện...")
+    State.LanChay = State.LanChay + 1
+    
+    local Character = LayNhanVat()
+    if not Character then return false end
+    
+    local HRP = LayHRP(Character)
+    if not HRP then return false end
+    
+    for i = 1, 5 do
+        if not State.DangChay then return false end
+        
+        pcall(function()
+            local Services = ReplicatedStorage:FindFirstChild("Knit")
+            if Services then
+                Services = Services:FindFirstChild("Knit")
+                if Services then
+                    Services = Services:FindFirstChild("Services")
+                    if Services and Services:FindFirstChild("MovementService") then
+                        Services.MovementService.RE.Dash:FireServer("Back", true)
+                    end
+                end
+            end
+        end)
+        
+        task.wait(Config.TocDoBypas)
+    end
+    
+    LuuNhat("Vượt qua thành công ✓")
+    return true
+end
+
+local function FarmSkill()
+    if not State.DangChay or not Config.FarmSkill then return false end
+    
+    LuuNhat("Đang farm skill...")
+    
+    local Character = LayNhanVat()
+    if not Character then return false end
+    
+    local Target = LayDummy()
+    if not Target then return false end
+    
+    local TargetHRP = LayHRP(Target)
+    local CharacterHRP = LayHRP(Character)
+    if not TargetHRP or not CharacterHRP then return false end
+    
+    local startTime = os.clock()
+    
+    while State.DangChay and Config.FarmSkill do
+        local Ultimate = tonumber(LocalPlayer:GetAttribute("Ultimate")) or 0
+        
+        if Ultimate >= 100 then
+            LuuNhat("Skill tối đa! ✓")
+            return true
+        end
+        
+        if os.clock() - startTime > 120 then
+            LuuNhat("Farm quá lâu - khởi động lại...")
+            return false
+        end
+        
+        pcall(function()
+            local Services = ReplicatedStorage:FindFirstChild("Knit")
+            if Services then
+                Services = Services:FindFirstChild("Knit")
+                if Services then
+                    Services = Services:FindFirstChild("Services")
+                    if Services then
+                        if Services:FindFirstChild("GojoService") then
+                            Services.GojoService.RE.Activated:FireServer("Up", nil)
+                        end
+                        
+                        local Moveset = Character:FindFirstChild("Moveset")
+                        if Moveset then
+                            if Moveset:FindFirstChild("Rapid Punches") and Services:FindFirstChild("RapidPunchesService") then
+                                Services.RapidPunchesService.RE.Activated:FireServer(Moveset["Rapid Punches"], nil)
+                            end
+                            
+                            if Moveset:FindFirstChild("Twofold Kick") and Services:FindFirstChild("TwofoldKickService") then
+                                Services.TwofoldKickService.RE.Activated:FireServer(Moveset["Twofold Kick"], nil)
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+        
+        task.wait(0.1)
+    end
+    
+    return false
+end
+
+local function KichHoatDomain()
+    if not State.DangChay or not Config.TuDongUlt then return end
+    
+    LuuNhat("Chuẩn bị kích hoạt domain...")
+    
+    local Character = LayNhanVat()
+    if not Character then return end
+    
+    local HRP = LayHRP(Character)
+    if not HRP then return end
+    
+    while State.DangChay do
+        local Info = Character:FindFirstChild("Info")
+        if Info and not Info:FindFirstChild("Stun") then
+            break
+        end
+        task.wait(0.1)
+    end
+    
+    if not State.DangChay then return end
+    
+    task.wait(1)
+    
+    LuuNhat("🌀 Kích hoạt 0.2 Domain...")
+    
+    pcall(function()
+        local Services = ReplicatedStorage:FindFirstChild("Knit")
+        if Services then
+            Services = Services:FindFirstChild("Knit")
+            if Services then
+                Services = Services:FindFirstChild("Services")
+                if Services and Services:FindFirstChild("GojoService") then
+                    Services.GojoService.RE.Ultimate:FireServer()
+                end
+            end
+        end
+    end)
+    
+    task.wait(0.3)
+    
+    pcall(function()
+        local Services = ReplicatedStorage:FindFirstChild("Knit")
+        if Services then
+            Services = Services:FindFirstChild("Knit")
+            if Services then
+                Services = Services:FindFirstChild("Services")
+                if Services and Services:FindFirstChild("GojoService") then
+                    Services.GojoService.RE.RightActivated:FireServer(nil)
+                end
+            end
+        end
+    end)
+    
+    task.wait(4.5)
+end
+
+local function GietHet()
+    if not State.DangChay then return end
+    
+    LuuNhat("💀 Bắt đầu giết...")
+    
+    local Character = LayNhanVat()
+    if not Character then return end
+    
+    local HRP = LayHRP(Character)
+    if not HRP then return end
+    
+    local indexNguoi = 1
+    local demGiet = 0
+    
+    while State.DangChay do
+        local Info = Character:FindFirstChild("Info")
+        if not Info or not Info:FindFirstChild("InSkill") then
+            LuuNhat("Domain kết thúc - dừng giết")
+            break
+        end
+        
+        local enemies = LayNhomThuChua()
+        
+        if #enemies > 0 then
+            if indexNguoi > #enemies then
+                indexNguoi = 1
+            end
+            
+            local target = enemies[indexNguoi]
+            if target then
+                local targetHRP = LayHRP(target)
+                if targetHRP then
+                    HRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 3)
+                    demGiet = demGiet + 1
+                    State.SoNguoiChet = demGiet
+                end
+            end
+            
+            indexNguoi = indexNguoi + 1
+        end
+        
+        task.wait(Config.TocDoKill)
+    end
+    
+    LuuNhat("Kết thúc giết - " .. demGiet .. " người")
+end
+
+local function KetThuc()
+    if not Config.TuDongEnd then
+        LuuNhat("Chờ lệnh tiếp...")
+        return
+    end
+    
+    if Config.CheDoKetThuc == "Hop" then
+        LuuNhat("Đang hop server...")
+        task.wait(1)
+        pcall(function()
+            local Services = ReplicatedStorage:FindFirstChild("Knit")
+            if Services then
+                Services = Services:FindFirstChild("Knit")
+                if Services then
+                    Services = Services:FindFirstChild("Services")
+                    if Services and Services:FindFirstChild("RankedService") then
+                        Services.RankedService.RE.Teleport:FireServer(2)
+                    end
+                end
+            end
+        end)
+    elseif Config.CheDoKetThuc == "Leave" then
+        LuuNhat("Đang rời game...")
+        task.wait(1)
+        LocalPlayer:Kick("Hoàn thành!")
+    else
+        LuuNhat("Chế độ chờ - đợi lệnh tiếp")
+    end
+end
+
+function VongLapChinh()
+    while State.DangChay do
+        if Config.BypassTuDong then
+            if not VuotQua() then
+                State.DangChay = false
+                break
+            end
+            task.wait(1)
+        end
+        
+        if Config.FarmSkill then
+            if not FarmSkill() then
+                task.wait(2)
+            end
+        end
+        
+        if Config.TuDongUlt and State.DangChay then
+            KichHoatDomain()
+            if State.DangChay then
+                GietHet()
+            end
+        end
+        
+        KetThuc()
+        break
+    end
+    
+    LuuNhat("Script dừng")
+    CapNhatNhan()
+end
+
+CapNhatNhan()
+
+Rayfield:Notify({
+    Title = "GOJO KILL ALL",
+    Content = "Script tải xong! Nhấn BẮT ĐẦU để chạy.",
+    Duration = 5,
+    Image = 4483362458,
+})
+
+print("GOJO KILL ALL by JJSISBEST - Rayfield Edition loaded!")
